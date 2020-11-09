@@ -1,9 +1,9 @@
-import commander from 'commander'
 
 import packageJson from '../package.json'
+import Base from './base'
+import subCommands from './subcommands'
 
-commander.version(packageJson.version)
+const cli = new Base('sti', packageJson.version)
+cli.useSubCommands(subCommands)
 
-commander.command('add [todo]').description('Adiciona um todo').action(todo => console.log(todo))
-
-commander.parse(process.argv)
+cli.run(process.argv)
