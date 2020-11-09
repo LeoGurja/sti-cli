@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsnd src/index.ts"
+    "start": "DEBUG=true tsnd src/index.ts"
   },
   "devDependencies": {
     "@types/inquirer": "^7.3.1",
