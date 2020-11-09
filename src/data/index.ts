@@ -18,7 +18,8 @@ export class State {
   }
 
   save(name: string, data: any, type: StateType) {
-    writeFileSync(path(name, type), JSON.stringify(data, null, '\t'))
+    const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
+    writeFileSync(path(name, type), value)
   }
 
   delete(name: string, type: StateType) {

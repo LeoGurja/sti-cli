@@ -9,7 +9,7 @@ const vpnForm = [
   },
   {
     type: 'password',
-    name: 'senha',
+    name: 'password',
     message: 'senha do iduff'
   }
 ]
@@ -30,11 +30,7 @@ export class VpnForm {
   }
 
   private makeFile(answers: VpnFormAnswers) {
-    return `
-host = vpn.uff.br
-port = 10443
-username = ${answers.login}
-password = ${answers.password}`
+    return `host = vpn.uff.br\nport = 10443\nusername = ${answers.login}\npassword = ${answers.password}\n`
   }
 }
 
