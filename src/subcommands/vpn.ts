@@ -24,10 +24,12 @@ export default class Vpn extends Base {
 
   private async login() {
     await vpnForm.save()
+    console.log(chalk.green('Credenciais salvas!'))
   }
 
   private logout() {
     vpnForm.delete()
+    console.log(chalk.yellow('Credenciais removidas!'))
   }
 
   private status() {
