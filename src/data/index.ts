@@ -22,8 +22,17 @@ export class State {
     writeFileSync(path(name, type), value)
   }
 
+  sudoSave(name: string, data: any, type: StateType) {
+    const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
+    shell.exec(`echo '${value}' | sudo tee ${path(name, type)}`)
+  }
+
   delete(name: string, type: StateType) {
     shell.rm(path(name, type))
+  }
+
+  sudoDelete(name: string, type: StateType) {
+    shell.exec(`sudo rm ${path(name, type)}`)
   }
 }
 
