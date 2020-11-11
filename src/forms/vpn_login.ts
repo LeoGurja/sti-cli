@@ -1,37 +1,27 @@
-import inquirer from 'inquirer'
 import state from '../data'
 
-const vpnForm = [
-  {
-    type: 'input',
-    name: 'login',
-    message: 'insira seu cpf'
-  },
-  {
-    type: 'password',
-    name: 'password',
-    message: 'senha do iduff'
-  }
-]
-
-interface VpnFormAnswers {
+interface VpnLoginForm {
   login: string,
   password: string
 }
 
-export class VpnForm {
-  async save() {
-    const answers: VpnFormAnswers = await inquirer.prompt(vpnForm)
-    state.save('vpnconfig', this.makeFile(answers), 'config')
+export class VpnLogin {
+  save(data: VpnLoginForm) {
+    state.save('vpnconfig', this.makeFile(data), 'config')
   }
 
   delete() {
     state.delete('vpnconfig', 'config')
   }
 
-  private makeFile(answers: VpnFormAnswers) {
-    return `host = vpn.uff.br\nport = 10443\nusername = ${answers.login}\npassword = ${answers.password}\n`
+  private makeFile(answers: VpnLoginForm) {
+    return `host = vpn.uff.br
+port = 10443
+username = ${answers.login}
+password = ${answers.password}
+trusted-cert = 3130a81f179c704016c448ce54ae7abf6f0cb5f2ba982a5f8690e5ee7e7322c0
+`
   }
 }
 
-export default new VpnForm()
+export default new VpnLogin()
