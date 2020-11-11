@@ -9,7 +9,7 @@ const cacheDir = process.env.XDG_CACHE_HOME || join(home, '/.cache')
 
 export type StateType = 'config' | 'data' | 'cache' | 'systemd'
 
-const types = {
+export const types = {
   config: join(configDir, '/sti'),
   data: join(dataDir, '/sti'),
   cache: join(cacheDir, '/sti'),
