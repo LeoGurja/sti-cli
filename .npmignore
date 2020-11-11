@@ -1,6 +1,7 @@
 src/
 node_modules/
-.eslintrc.js
+coverage/
+.eslintrc.json
 .gitignore
 package-lock.json
 tsconfig.json
