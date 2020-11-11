@@ -21,5 +21,8 @@
       "error",
       "never"
     ]
-  }
+  },
+  "ignorePatterns": [
+    "build/**/*"
+  ]
 }
