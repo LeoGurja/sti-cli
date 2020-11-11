@@ -1,6 +1,6 @@
 {
   "name": "@sti-uff/cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "cli para configuração de ambiente da Sti Uff.",
   "main": "build/index.js",
   "author": "Leonardo Gurgel",
@@ -40,8 +40,8 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "@babel/core": "^7.12.3",
     "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
     "@babel/register": "^7.12.1",
     "@babel/runtime": "^7.12.5",
     "chalk": "^4.1.0",
