@@ -1,0 +1,6 @@
+src/
+node_modules/
+.eslintrc.js
+.gitignore
+package-lock.json
+tsconfig.json

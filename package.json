@@ -2,9 +2,12 @@
   "name": "sti-cli",
   "version": "0.1.0",
   "description": "cli para configuração de ambiente da Sti Uff.",
-  "main": "src/index.ts",
+  "main": "build/index.js",
   "author": "Leonardo Gurgel",
   "license": "MIT",
+  "files": [
+    "build/**/*"
+  ],
   "bin": {
     "sti": "build/index.js"
   },
