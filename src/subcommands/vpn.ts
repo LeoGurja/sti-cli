@@ -1,26 +1,9 @@
 import chalk from 'chalk'
 import shell from '../helpers/shell'
-import vpnLogin from '../forms/vpn_login'
-import vpnService from '../forms/vpn_service'
-import path from '../data/path'
-
+import { login, service } from '../data/vpn'
 import Base from '../base'
-import inquirer from 'inquirer'
 
-const vpnForm = [
-  {
-    type: 'input',
-    name: 'login',
-    message: 'insira seu cpf'
-  },
-  {
-    type: 'password',
-    name: 'password',
-    message: 'senha do iduff'
-  }
-]
-
-export default class Vpn extends Base {
+class Vpn extends Base {
   init() {
     this.useCommand('start', 'Inicia o serviço da vpn', this.start)
     this.useCommand('login', 'preenche as credenciais', this.login)
@@ -43,12 +26,12 @@ export default class Vpn extends Base {
   }
 
   async login() {
-    vpnLogin.save(await inquirer.prompt(vpnForm))
+    await login.save()
     console.log(chalk.green('Credenciais salvas!'))
   }
 
   logout() {
-    vpnLogin.delete()
+    login.delete()
     console.log(chalk.yellow('Credenciais removidas!'))
   }
 
@@ -67,12 +50,14 @@ export default class Vpn extends Base {
   }
 
   install() {
-    vpnService.save({ config: path('vpnconfig', 'config') })
+    service.save()
     shell.exec('sudo systemctl daemon-reload')
   }
 
   uninstall() {
-    vpnService.delete()
+    service.delete()
     shell.exec('sudo systemctl daemon-reload')
   }
 }
+
+export default new Vpn('vpn')

@@ -1,6 +1,6 @@
 import shell from '../helpers/shell'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import path, { StateType, createDirs } from './path'
+import path, { StateType, createDirs } from '../helpers/path'
 
 export class State {
   constructor() {
