@@ -1,6 +1,2 @@
-import Vpn from './vpn'
-import Base from '../base'
-
-const subCommands: Base[] = [new Vpn('vpn')]
-
-export default subCommands
+export { default as vpn } from './vpn'
+export { default as repo } from './repo'

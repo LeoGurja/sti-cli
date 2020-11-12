@@ -2,11 +2,12 @@
 import updateNotifier from 'update-notifier'
 import pkg from '../package.json'
 import Base from './base'
-import subCommands from './subcommands'
+import { vpn, repo } from './subcommands'
 require('@babel/register')({ extensions: ['.js', '.ts'] })
 
 const cli = new Base('sti', pkg.version)
-cli.useSubCommands(subCommands)
+cli.useSubCommand(vpn)
+cli.useSubCommand(repo)
 
 updateNotifier({ pkg }).notify()
 

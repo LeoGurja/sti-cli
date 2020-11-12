@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import path, { createDirs, types } from '../../src/data/path'
+import path, { createDirs, types } from '../../src/helpers/path'
 
 test('should parse path', () => {
   expect(path('vpnconfig', 'config')).toMatch(/\.config\/sti\/vpnconfig$/)
