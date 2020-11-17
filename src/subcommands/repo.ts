@@ -11,7 +11,7 @@ class Repo extends Base {
 
   clone(repo: string) {
     const state = repoLogin.get()
-    shell.exec(`git clone https://${state.login}:${state.token}@app.sti.uff.br/gitlab/${repo}`)
+    shell.exec(`git clone https://${state.login}:${state.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
   }
 
   async login() {
