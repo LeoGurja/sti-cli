@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import shell from '../helpers/shell'
 import { login, service } from '../data/vpn'
 import Base from '../base'
+import install, { isInstalled } from '../helpers/install'
 
 class Vpn extends Base {
   init() {
@@ -50,6 +51,13 @@ class Vpn extends Base {
   }
 
   install() {
+    if (!isInstalled('openfortivpn')) {
+      if (!install('openfortivpn')) {
+        console.log(chalk.red('Não foi possível instalar a vpn'))
+        return
+      }
+    }
+
     service.save()
     shell.exec('sudo systemctl daemon-reload')
   }
