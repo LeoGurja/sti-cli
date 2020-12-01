@@ -9,7 +9,7 @@ const commands = {
   pacman: '-S'
 }
 
-export default function install(packageName: string): Boolean {
+export default function install(packageName: string): boolean {
   const packageManager = getPackageManager()
   if (!packageManager) return false
 
@@ -17,7 +17,7 @@ export default function install(packageName: string): Boolean {
   return output.code === 0
 }
 
-export function isInstalled(packageName: string): Boolean {
+export function isInstalled(packageName: string): boolean {
   const output = shell.exec(`${packageName} --version`)
   return output.code !== 0
 }
