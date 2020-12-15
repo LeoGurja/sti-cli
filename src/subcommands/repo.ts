@@ -24,11 +24,11 @@ class Repo extends Base {
       log.error('Não foi possível ler a url do remoto')
     }
     const novaUrl = url.stdout.replace(/:.+@/, `:${config.token}@`)
-    if (novaUrl === url) {
+    if (novaUrl === url.stdout) {
       log.error('Nova url é idêntica à antiga')
       return
     }
-    if (shell.exec(`git remote set-url ${novaUrl}`).code !== 0) {
+    if (shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
       log.error('Não foi possível atualizar a url do remoto')
     } else {
       log.sucess('Url atualizada!')
