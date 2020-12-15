@@ -18,16 +18,18 @@ export default class Login {
     State.delete('repo.json', 'config')
   }
 
-  static questions = [
-    {
-      type: 'input',
-      name: 'login',
-      message: 'usuário do gitlab'
-    },
-    {
-      type: 'input',
-      name: 'token',
-      message: 'token de acesso'
-    }
-  ]
+  static questions() {
+    return [
+      {
+        type: 'input',
+        name: 'login',
+        message: 'usuário do gitlab'
+      },
+      {
+        type: 'input',
+        name: 'token',
+        message: 'token de acesso'
+      }
+    ]
+  }
 }

@@ -29,7 +29,7 @@ class Vpn extends Base {
   }
 
   async login() {
-    const answers = await inquirer.prompt(Login.questions)
+    const answers = await inquirer.prompt(Login.questions())
     Login.save(answers)
 
     log.sucess('Credenciais salvas!')

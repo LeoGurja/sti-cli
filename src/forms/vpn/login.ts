@@ -14,18 +14,20 @@ export default class Login {
     State.delete('vpnconfig', 'config')
   }
 
-  static questions = [
-    {
-      type: 'input',
-      name: 'login',
-      message: 'insira seu cpf'
-    },
-    {
-      type: 'password',
-      name: 'password',
-      message: 'senha do iduff'
-    }
-  ]
+  static questions() {
+    return [
+      {
+        type: 'input',
+        name: 'login',
+        message: 'insira seu cpf'
+      },
+      {
+        type: 'password',
+        name: 'password',
+        message: 'senha do iduff'
+      }
+    ]
+  }
 
   private static makeFile(answers: LoginAnswers) {
     return `host = vpn.uff.br
