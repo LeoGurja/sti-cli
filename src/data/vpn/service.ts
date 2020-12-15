@@ -3,11 +3,11 @@ import path from '../../helpers/path'
 
 export class Service {
   save() {
-    state.sudoSave('openfortivpn.service', this.makeFile(), 'systemd')
+    state.sudoSave('/usr/lib/systemd/system/openfortivpn.service', this.makeFile())
   }
 
   delete() {
-    state.sudoDelete('openfortivpn.service', 'systemd')
+    state.sudoDelete('/usr/lib/systemd/system/openfortivpn.service')
   }
 
   private makeFile() {

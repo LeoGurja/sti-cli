@@ -1,6 +1,6 @@
 import shell from '../helpers/shell'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import path, { StateType, SudoStateType, createDirs } from '../helpers/path'
+import path, { StateType, createDirs } from '../helpers/path'
 
 export class State {
   constructor() {
@@ -22,17 +22,17 @@ export class State {
     writeFileSync(path(name, type), value)
   }
 
-  sudoSave(name: string, data: any, type: SudoStateType) {
+  sudoSave(path: string, data: any) {
     const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
-    shell.exec(`echo '${value}' | sudo tee ${path(name, type)}`)
+    shell.exec(`echo '${value}' | sudo tee ${path}`)
   }
 
   delete(name: string, type: StateType) {
     shell.rm(path(name, type))
   }
 
-  sudoDelete(name: string, type: SudoStateType) {
-    shell.exec(`sudo rm ${path(name, type)}`)
+  sudoDelete(path: string) {
+    shell.exec(`sudo rm ${path}`)
   }
 }
 

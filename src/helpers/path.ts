@@ -8,16 +8,14 @@ const dataDir = process.env.XDG_DATA_HOME || join(home, '/.local/share')
 const cacheDir = process.env.XDG_CACHE_HOME || join(home, '/.cache')
 
 export type StateType = 'config' | 'data' | 'cache'
-export type SudoStateType = 'systemd'
 
 export const types = {
   config: join(configDir, '/sti'),
   data: join(dataDir, '/sti'),
-  cache: join(cacheDir, '/sti'),
-  systemd: '/usr/lib/systemd/system'
+  cache: join(cacheDir, '/sti')
 }
 
-export default function getPath(name: string, type: StateType | SudoStateType) {
+export default function getPath(name: string, type: StateType) {
   return join(types[type], name)
 }
 
