@@ -1,8 +1,10 @@
-import chalk from 'chalk'
+import inquirer from 'inquirer'
 import shell from '../helpers/shell'
-import { login, service } from '../data/vpn'
+import Login from '../forms/vpn/login'
+import Service from '../forms/vpn/service'
 import Base from '../base'
-import install, { isInstalled } from '../helpers/install'
+import environment from '../environment'
+import log from '../helpers/log'
 
 class Vpn extends Base {
   init() {
@@ -19,51 +21,57 @@ class Vpn extends Base {
   start() {
     const output = shell.exec('sudo systemctl start openfortivpn')
     if (output.code === 0) {
-      console.log(chalk.green('Vpn iniciada!'))
+      log.sucess('Vpn iniciada!')
     } else {
-      console.error(chalk.red('Erro ao iniciar vpn:'))
-      console.dir(output.stderr)
+      log.error('Erro ao iniciar vpn:')
+      log.error(output.stderr)
     }
   }
 
   async login() {
-    await login.save()
-    console.log(chalk.green('Credenciais salvas!'))
+    const answers = await inquirer.prompt(Login.questions())
+    Login.save(answers)
+
+    log.sucess('Credenciais salvas!')
   }
 
   logout() {
-    login.delete()
-    console.log(chalk.yellow('Credenciais removidas!'))
+    Login.delete()
+    log.sucess('Credenciais removidas!')
   }
 
   status() {
-    console.log(chalk.blue(shell.exec('systemctl status openfortivpn').stdout))
+    log.info(shell.exec('systemctl status openfortivpn').stdout)
   }
 
   stop() {
     const output = shell.exec('sudo systemctl stop openfortivpn')
     if (output.code === 0) {
-      console.log(chalk.green('Vpn finalizada!'))
+      log.sucess('Vpn finalizada!')
     } else {
-      console.error(chalk.red('Erro ao parar vpn:'))
-      console.dir(output.stderr)
+      log.error('Erro ao fechar vpn:')
+      log.error(output.stderr)
     }
   }
 
   install() {
-    if (!isInstalled('openfortivpn')) {
-      if (!install('openfortivpn')) {
-        console.log(chalk.red('Não foi possível instalar a vpn'))
+    if (!environment.usesSystemd()) {
+      log.error('Não é possível utilizar a vpn em uma distribuição sem Systemd')
+    }
+    if (!environment.isInstalled('openfortivpn')) {
+      if (!environment.install('openfortivpn')) {
+        log.error('Não foi possível instalar a vpn')
         return
       }
     }
 
-    service.save()
+    Service.save()
+
     shell.exec('sudo systemctl daemon-reload')
   }
 
   uninstall() {
-    service.delete()
+    Service.delete()
     shell.exec('sudo systemctl daemon-reload')
   }
 }
