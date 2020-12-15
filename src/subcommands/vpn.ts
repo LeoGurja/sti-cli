@@ -1,5 +1,7 @@
+import inquirer from 'inquirer'
 import shell from '../helpers/shell'
-import { login, service } from '../data/vpn'
+import Login from '../forms/vpn/login'
+import Service from '../forms/vpn/service'
 import Base from '../base'
 import environment from '../environment'
 import log from '../helpers/log'
@@ -27,12 +29,14 @@ class Vpn extends Base {
   }
 
   async login() {
-    await login.save()
+    const answers = await inquirer.prompt(Login.questions)
+    Login.save(answers)
+
     log.sucess('Credenciais salvas!')
   }
 
   logout() {
-    login.delete()
+    Login.delete()
     log.sucess('Credenciais removidas!')
   }
 
@@ -61,12 +65,13 @@ class Vpn extends Base {
       }
     }
 
-    service.save()
+    Service.save()
+
     shell.exec('sudo systemctl daemon-reload')
   }
 
   uninstall() {
-    service.delete()
+    Service.delete()
     shell.exec('sudo systemctl daemon-reload')
   }
 }

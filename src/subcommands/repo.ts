@@ -1,6 +1,8 @@
+import inquirer from 'inquirer'
 import Base from '../base'
 import shell from '../helpers/shell'
-import repoLogin from '../data/repo'
+import Login from '../forms/repo/login'
+import log from '../helpers/log'
 
 class Repo extends Base {
   init() {
@@ -10,16 +12,19 @@ class Repo extends Base {
   }
 
   clone(repo: string) {
-    const state = repoLogin.get()
-    shell.exec(`git clone https://${state.login}:${state.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+    const config = Login.get()
+    shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
   }
 
   async login() {
-    await repoLogin.save()
+    const answers = await inquirer.prompt(Login.questions)
+    Login.save(answers)
+    log.sucess('Credenciais salvas!')
   }
 
   logout() {
-    repoLogin.delete()
+    Login.delete()
+    log.sucess('Credenciais removidas!')
   }
 }
 
