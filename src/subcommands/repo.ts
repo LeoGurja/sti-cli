@@ -14,11 +14,17 @@ class Repo extends Base {
 
   clone(repo: string) {
     const config = Login.get()
+    if (!config.token) {
+      log.error('É necessário fazer login antes de clonar um repositório')
+    }
     shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
   }
 
   updateOrigin() {
     const config = Login.get()
+    if (!config.token) {
+      log.error('É necessário fazer login antes de atualizar a url do remoto')
+    }
     const url = shell.exec('git remote get-url origin')
     if (url.code !== 0) {
       log.error('Não foi possível ler a url do remoto')
