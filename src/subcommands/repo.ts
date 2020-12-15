@@ -9,11 +9,30 @@ class Repo extends Base {
     this.useCommand('clone [REPO]', 'clona um repositório do gitlab', this.clone)
     this.useCommand('login', 'salva usuário e token do gitlab', this.login)
     this.useCommand('logout', 'deleta as credenciais salvas', this.logout)
+    this.useCommand('update-origin', 'atualiza a url do projeto', this.updateOrigin)
   }
 
   clone(repo: string) {
     const config = Login.get()
     shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+  }
+
+  updateOrigin() {
+    const config = Login.get()
+    const url = shell.exec('git remote get-url origin')
+    if (url.code !== 0) {
+      log.error('Não foi possível ler a url do remoto')
+    }
+    const novaUrl = url.stdout.replace(/:.+@/, `:${config.token}@`)
+    if (novaUrl === url) {
+      log.error('Nova url é idêntica à antiga')
+      return
+    }
+    if (shell.exec(`git remote set-url ${novaUrl}`).code !== 0) {
+      log.error('Não foi possível atualizar a url do remoto')
+    } else {
+      log.sucess('Url atualizada!')
+    }
   }
 
   async login() {
