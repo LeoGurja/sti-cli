@@ -18,10 +18,10 @@ const types = {
 
 export default class State {
   static get<T>(name: string, type: StateType): T {
-    const file = this.getPath(name, type)
+    const file = State.getPath(name, type)
 
     if (!existsSync(file)) {
-      this.save(file, {}, type)
+      State.save(file, {}, type)
     }
 
     return JSON.parse(readFileSync(file).toString())
@@ -33,7 +33,7 @@ export default class State {
 
   static save(name: string, data: any, type: StateType) {
     const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
-    writeFileSync(this.getPath(name, type), value)
+    writeFileSync(State.getPath(name, type), value)
   }
 
   static sudoSave(path: string, data: any) {
