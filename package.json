@@ -14,7 +14,7 @@
   "scripts": {
     "build": "babel src --out-dir build --copy-files --extensions '.ts,.js'",
     "dev": "DEBUG=true tsnd src/index.ts",
-    "test": "jest --coverage",
+    "test": "DEBUG=true jest --coverage",
     "check": "tsc"
   },
   "devDependencies": {
