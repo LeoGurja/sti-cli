@@ -10,11 +10,11 @@ test('should create non-existent directories', () => {
   createDirs()
 
   // mock retorna .config como inexistente e resto como existente
-  expect(console.log).toHaveBeenCalledWith(chalk.yellow(`Criando pasta ${types.config}`))
+  expect(console.log).toHaveBeenCalledWith(chalk.gray(`Criando pasta ${types.config}`))
 
-  expect(console.log).not.toHaveBeenCalledWith(chalk.yellow(`Criando pasta ${types.data}`))
-  expect(console.log).not.toHaveBeenCalledWith(chalk.yellow(`Criando pasta ${types.systemd}`))
-  expect(console.log).not.toHaveBeenCalledWith(chalk.yellow(`Criando pasta ${types.cache}`))
+  expect(console.log).not.toHaveBeenCalledWith(chalk.gray(`Criando pasta ${types.data}`))
+  expect(console.log).not.toHaveBeenCalledWith(chalk.gray(`Criando pasta ${types.systemd}`))
+  expect(console.log).not.toHaveBeenCalledWith(chalk.gray(`Criando pasta ${types.cache}`))
 })
 
 function mockConsole() {
