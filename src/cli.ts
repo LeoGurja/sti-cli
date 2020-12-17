@@ -1,7 +1,7 @@
 import commander from 'commander'
 
 export default class Cli extends commander.Command {
-  add(name: string, description: string, action: (...args: any[]) => void) {
+  add(name: string, description: string, action: (...args: string[]) => void) {
     this.command(name).description(description).action(action)
     return this
   }
