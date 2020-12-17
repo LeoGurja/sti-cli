@@ -1,6 +1,6 @@
 import inquirer from 'inquirer'
 import Base from '../base'
-import shell from '../helpers/shell'
+import env from '../environment'
 import Login from '../forms/repo/login'
 import log from '../helpers/log'
 
@@ -17,7 +17,7 @@ class Repo extends Base {
     if (!config.token) {
       log.error('É necessário fazer login antes de clonar um repositório')
     }
-    shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+    env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
   }
 
   updateOrigin() {
@@ -25,7 +25,7 @@ class Repo extends Base {
     if (!config.token) {
       log.error('É necessário fazer login antes de atualizar a url do remoto')
     }
-    const url = shell.exec('git remote get-url origin')
+    const url = env.shell.exec('git remote get-url origin')
     if (url.code !== 0) {
       log.error('Não foi possível ler a url do remoto')
     }
@@ -34,7 +34,7 @@ class Repo extends Base {
       log.error('Nova url é idêntica à antiga')
       return
     }
-    if (shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
+    if (env.shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
       log.error('Não foi possível atualizar a url do remoto')
     } else {
       log.sucess('Url atualizada!')

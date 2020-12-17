@@ -1,9 +1,8 @@
 import inquirer from 'inquirer'
-import shell from '../helpers/shell'
 import Login from '../forms/vpn/login'
 import Service from '../forms/vpn/service'
 import Base from '../base'
-import environment from '../environment'
+import env from '../environment'
 import log from '../helpers/log'
 
 class Vpn extends Base {
@@ -19,7 +18,7 @@ class Vpn extends Base {
   }
 
   start() {
-    const output = shell.exec('sudo systemctl start openfortivpn')
+    const output = env.shell.exec('sudo systemctl start openfortivpn')
     if (output.code === 0) {
       log.sucess('Vpn iniciada!')
     } else {
@@ -41,11 +40,11 @@ class Vpn extends Base {
   }
 
   status() {
-    log.info(shell.exec('systemctl status openfortivpn').stdout)
+    log.info(env.shell.exec('systemctl status openfortivpn').stdout)
   }
 
   stop() {
-    const output = shell.exec('sudo systemctl stop openfortivpn')
+    const output = env.shell.exec('sudo systemctl stop openfortivpn')
     if (output.code === 0) {
       log.sucess('Vpn finalizada!')
     } else {
@@ -55,11 +54,11 @@ class Vpn extends Base {
   }
 
   install() {
-    if (!environment.usesSystemd()) {
+    if (!env.usesSystemd()) {
       log.error('Não é possível utilizar a vpn em uma distribuição sem Systemd')
     }
-    if (!environment.isInstalled('openfortivpn')) {
-      if (!environment.install('openfortivpn')) {
+    if (!env.isInstalled('openfortivpn')) {
+      if (!env.install('openfortivpn')) {
         log.error('Não foi possível instalar a vpn')
         return
       }
@@ -67,12 +66,12 @@ class Vpn extends Base {
 
     Service.save()
 
-    shell.exec('sudo systemctl daemon-reload')
+    env.shell.exec('sudo systemctl daemon-reload')
   }
 
   uninstall() {
     Service.delete()
-    shell.exec('sudo systemctl daemon-reload')
+    env.shell.exec('sudo systemctl daemon-reload')
   }
 }
 

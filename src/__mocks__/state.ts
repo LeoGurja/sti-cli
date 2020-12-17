@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import shell from '../helpers/shell'
+import env from '../environment'
 import log from '../helpers/log'
 
 type StateType = 'config' | 'data' | 'cache'
@@ -35,26 +35,26 @@ export default class State {
     const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
     const fileName = path.match(/\/[^/]+$/)
     if (fileName) {
-      shell.exec(`echo '${value}' | tee ${join(__dirname, '../../test/tmp/system', fileName[0])}`)
+      env.shell.exec(`echo '${value}' | tee ${join(__dirname, '../../test/tmp/system', fileName[0])}`)
     }
   }
 
   static delete(name: string, type: StateType) {
-    shell.rm(State.getPath(name, type))
+    env.shell.rm(State.getPath(name, type))
   }
 
   static sudoDelete(path: string) {
     const fileName = path.match(/\/[^/]+$/)
     if (fileName) {
-      shell.exec(`rm ./test/tmp/system${fileName[0]}`)
+      env.shell.exec(`rm ./test/tmp/system${fileName[0]}`)
     }
   }
 
   static createDirs() {
     for (const type of Object.values(types)) {
-      if (shell.ls(type).code !== 0) {
+      if (env.shell.ls(type).code !== 0) {
         log.info(`Criando pasta ${type}`)
-        shell.mkdir(type)
+        env.shell.mkdir(type)
       }
     }
   }

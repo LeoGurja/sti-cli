@@ -1,4 +1,4 @@
-import shell from '../helpers/shell'
+import shell from './shell'
 import log from '../helpers/log'
 
 type PackageManagerName = 'apt' | 'dnf' | 'pacman'
