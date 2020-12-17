@@ -1,7 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import env from './environment'
-import log from './helpers/log'
+import * as env from './environment'
 
 type StateType = 'config' | 'data' | 'cache'
 
@@ -52,7 +51,7 @@ export default class State {
   static createDirs() {
     for (const type of Object.values(types)) {
       if (env.shell.ls(type).code !== 0) {
-        log.debug(`Criando pasta ${type}`)
+        env.log.debug(`Criando pasta ${type}`)
         env.shell.mkdir(type)
       }
     }
@@ -60,6 +59,6 @@ export default class State {
 }
 
 function printHomeNotFound(): never {
-  log.error('Não foi possível encontrar a HOME')
+  env.log.error('Não foi possível encontrar a HOME')
   process.exit(1)
 }

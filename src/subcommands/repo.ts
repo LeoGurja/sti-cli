@@ -1,56 +1,52 @@
 import inquirer from 'inquirer'
-import Base from '../base'
-import env from '../environment'
+import Cli from '../cli'
+import * as env from '../environment'
 import Login from '../forms/repo/login'
-import log from '../helpers/log'
 
-class Repo extends Base {
-  init() {
-    this.useCommand('clone [REPO]', 'clona um repositório do gitlab', this.clone)
-    this.useCommand('login', 'salva usuário e token do gitlab', this.login)
-    this.useCommand('logout', 'deleta as credenciais salvas', this.logout)
-    this.useCommand('update-origin', 'atualiza a url do projeto', this.updateOrigin)
+export default function repo() {
+  return new Cli('repo')
+    .add('clone [REPO]', 'clona um repositório do gitlab', clone)
+    .add('login', 'salva usuário e token do gitlab', login)
+    .add('logout', 'deleta as credenciais salvas', logout)
+    .add('update-origin', 'atualiza a url do projeto', updateOrigin)
+}
+
+function clone(repo: string) {
+  const config = Login.get()
+  if (!config.token) {
+    env.log.error('É necessário fazer login antes de clonar um repositório')
   }
+  env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+}
 
-  clone(repo: string) {
-    const config = Login.get()
-    if (!config.token) {
-      log.error('É necessário fazer login antes de clonar um repositório')
-    }
-    env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+function updateOrigin() {
+  const config = Login.get()
+  if (!config.token) {
+    env.log.error('É necessário fazer login antes de atualizar a url do remoto')
   }
-
-  updateOrigin() {
-    const config = Login.get()
-    if (!config.token) {
-      log.error('É necessário fazer login antes de atualizar a url do remoto')
-    }
-    const url = env.shell.exec('git remote get-url origin')
-    if (url.code !== 0) {
-      log.error('Não foi possível ler a url do remoto')
-    }
-    const novaUrl = url.stdout.replace(/:.+@/, `:${config.token}@`)
-    if (novaUrl === url.stdout) {
-      log.error('Nova url é idêntica à antiga')
-      return
-    }
-    if (env.shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
-      log.error('Não foi possível atualizar a url do remoto')
-    } else {
-      log.sucess('Url atualizada!')
-    }
+  const url = env.shell.exec('git remote get-url origin')
+  if (url.code !== 0) {
+    env.log.error('Não foi possível ler a url do remoto')
   }
-
-  async login() {
-    const answers = await inquirer.prompt(Login.questions())
-    Login.save(answers)
-    log.sucess('Credenciais salvas!')
+  const novaUrl = url.stdout.replace(/:.+@/, `:${config.token}@`)
+  if (novaUrl === url.stdout) {
+    env.log.error('Nova url é idêntica à antiga')
+    return
   }
-
-  logout() {
-    Login.delete()
-    log.sucess('Credenciais removidas!')
+  if (env.shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
+    env.log.error('Não foi possível atualizar a url do remoto')
+  } else {
+    env.log.sucess('Url atualizada!')
   }
 }
 
-export default new Repo('repo')
+async function login() {
+  const answers = await inquirer.prompt(Login.questions())
+  Login.save(answers)
+  env.log.sucess('Credenciais salvas!')
+}
+
+function logout() {
+  Login.delete()
+  env.log.sucess('Credenciais removidas!')
+}

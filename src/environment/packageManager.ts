@@ -1,5 +1,5 @@
 import shell from './shell'
-import log from '../helpers/log'
+import log from './log'
 
 type PackageManagerName = 'apt' | 'dnf' | 'pacman'
 
@@ -11,28 +11,26 @@ const commands = {
   pacman: '-S'
 }
 
-export default class PackageManager {
-  packageManager: PackageManagerName | null
+export function isInstalled(packageName: string) {
+  const output = shell.exec(`${packageName} --version`)
+  return output.code !== 0
+}
 
-  constructor() {
-    this.packageManager = this.getPackageManager()
+export function install(packageName: string): boolean {
+  const packageManager = getPackageManager()
+  if (!packageManager) {
+    return false
+  }
+  const output = shell.exec(`sudo ${packageManager} ${commands[packageManager]} ${packageName}`, { silent: false })
+  return output.code === 0
+}
+
+function getPackageManager(): PackageManagerName | null {
+  for (const packageManager of packageManagers) {
+    const output = shell.exec(`${packageManager} --version`)
+    if (output.code === 0) return packageManager
   }
 
-  getPackageManager(): PackageManagerName | null {
-    for (const packageManager of packageManagers) {
-      const output = shell.exec(`${packageManager} --version`)
-      if (output.code === 0) return packageManager
-    }
-
-    log.error('Gerenciador de pacote não encontrado')
-    return null
-  }
-
-  install(packageName: string): boolean {
-    if (!this.packageManager) {
-      return false
-    }
-    const output = shell.exec(`sudo ${this.packageManager} ${commands[this.packageManager]} ${packageName}`, { silent: false })
-    return output.code === 0
-  }
+  log.error('Gerenciador de pacote não encontrado')
+  return null
 }
