@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import inquirer from 'inquirer'
-import Login from '../forms/vpn/login'
-import Service from '../forms/vpn/service'
+import { loginForm, serviceForm } from '../forms/vpn'
 import Cli from '../cli'
 import * as env from '../environment'
 
@@ -27,14 +26,14 @@ async function start() {
 }
 
 async function login() {
-  const answers = await inquirer.prompt(Login.questions())
-  Login.save(answers)
+  const answers = await inquirer.prompt(loginForm.questions())
+  loginForm.save(answers)
 
   env.log.sucess('Credenciais salvas!')
 }
 
 function logout() {
-  Login.delete()
+  loginForm.remove()
   env.log.sucess('Credenciais removidas!')
 }
 
@@ -76,13 +75,13 @@ function install() {
     }
   }
 
-  Service.save()
+  serviceForm.save()
 
   env.shell.exec('sudo systemctl daemon-reload')
 }
 
 function uninstall() {
-  Service.delete()
+  serviceForm.remove()
   env.shell.exec('sudo systemctl daemon-reload')
 }
 

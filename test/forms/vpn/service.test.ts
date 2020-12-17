@@ -1,12 +1,12 @@
 import { join } from 'path'
 import { readFileSync, existsSync } from 'fs'
-import Service from '../../../src/forms/vpn/service'
+import { serviceForm } from '../../../src/forms/vpn'
 
 jest.mock('../../../src/state')
 
 describe('Vpn Service Form', () => {
   it('should save form', () => {
-    Service.save()
+    serviceForm.save()
     expect(readFileSync(join(__dirname, '../../tmp/system/openfortivpn.service'), { encoding: 'utf-8' })).toEqual(`Description = OpenFortiVPN
 After=network-online.target multi-user.target
 Documentation=man:openfortivpn(1)
@@ -23,8 +23,8 @@ WantedBy=multi-user.target
   })
 
   it('should delete form', () => {
-    Service.save()
-    Service.delete()
+    serviceForm.save()
+    serviceForm.remove()
 
     expect(existsSync(join(__dirname, '../../tmp/system/openfortivpn.service'))).toBe(false)
   })

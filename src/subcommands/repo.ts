@@ -1,7 +1,7 @@
 import inquirer from 'inquirer'
 import Cli from '../cli'
 import * as env from '../environment'
-import Login from '../forms/repo/login'
+import { loginForm } from '../forms/repo'
 
 export default function repo() {
   return new Cli('repo')
@@ -12,7 +12,7 @@ export default function repo() {
 }
 
 function clone(repo: string) {
-  const config = Login.get()
+  const config = loginForm.get()
   if (!config.token) {
     env.log.error('É necessário fazer login antes de clonar um repositório')
   }
@@ -20,7 +20,7 @@ function clone(repo: string) {
 }
 
 function updateOrigin() {
-  const config = Login.get()
+  const config = loginForm.get()
   if (!config.token) {
     env.log.error('É necessário fazer login antes de atualizar a url do remoto')
   }
@@ -41,12 +41,12 @@ function updateOrigin() {
 }
 
 async function login() {
-  const answers = await inquirer.prompt(Login.questions())
-  Login.save(answers)
+  const answers = await inquirer.prompt(loginForm.questions())
+  loginForm.save(answers)
   env.log.sucess('Credenciais salvas!')
 }
 
 function logout() {
-  Login.delete()
+  loginForm.remove()
   env.log.sucess('Credenciais removidas!')
 }
