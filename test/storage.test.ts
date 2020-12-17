@@ -13,12 +13,18 @@ describe('Path', () => {
   it('should create non-existent directories', () => {
     mockConsole()
     shell.exec(`rm -rf ${join(__dirname, 'tmp/config')}`)
+    shell.exec(`rm -rf ${join(__dirname, 'tmp/data')}`)
+    shell.exec(`rm -rf ${join(__dirname, 'tmp/cache')}`)
+
+    createDirs()
+    shell.exec(`rm -rf ${join(__dirname, 'tmp/config')}`)
     createDirs()
 
     // mock retorna .config como inexistente e resto como existente
-    expect(console.log).toHaveBeenCalledWith(chalk.blue('Criando pasta ./test/tmp/config'))
-    expect(console.log).not.toHaveBeenCalledWith(chalk.blue('Criando pasta ./test/tmp/cache'))
-    expect(console.log).not.toHaveBeenCalledWith(chalk.blue('Criando pasta ./test/tmp/data'))
+    expect(console.log).nthCalledWith(1, chalk.blue('Criando pasta ./test/tmp/config'))
+    expect(console.log).toBeCalledWith(chalk.blue('Criando pasta ./test/tmp/cache'))
+    expect(console.log).toBeCalledWith(chalk.blue('Criando pasta ./test/tmp/data'))
+    expect(console.log).nthCalledWith(4, chalk.blue('Criando pasta ./test/tmp/config'))
   })
 
   function mockConsole() {
