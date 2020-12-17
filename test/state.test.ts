@@ -1,19 +1,19 @@
 import chalk from 'chalk'
 import shell from 'shelljs'
 import { join } from 'path'
-import State from '../src/state'
+import { getPath, createDirs } from '../src/storage'
 
-jest.mock('../src/state')
+jest.mock('../src/storage')
 
 describe('Path', () => {
   it('should parse path', () => {
-    expect(State.getPath('vpnconfig', 'config')).toMatch(/test\/tmp\/config\/vpnconfig$/)
+    expect(getPath('vpnconfig', 'config')).toMatch(/test\/tmp\/config\/vpnconfig$/)
   })
 
   it('should create non-existent directories', () => {
     mockConsole()
     shell.exec(`rm -rf ${join(__dirname, 'tmp/config')}`)
-    State.createDirs()
+    createDirs()
 
     // mock retorna .config como inexistente e resto como existente
     expect(console.log).toHaveBeenCalledWith(chalk.blue('Criando pasta ./test/tmp/config'))

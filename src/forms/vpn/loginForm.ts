@@ -1,4 +1,4 @@
-import State from '../../state'
+import { setItem, removeItem } from '../../storage'
 
 interface LoginAnswers {
   login: string,
@@ -6,11 +6,11 @@ interface LoginAnswers {
 }
 
 export function save(answers: LoginAnswers) {
-  State.save('vpnconfig', makeFile(answers), 'config')
+  setItem('vpnconfig', makeFile(answers), 'config')
 }
 
 export function remove() {
-  State.delete('vpnconfig', 'config')
+  removeItem('vpnconfig', 'config')
 }
 
 export function questions() {

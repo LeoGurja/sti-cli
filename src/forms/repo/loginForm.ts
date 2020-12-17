@@ -1,4 +1,4 @@
-import State from '../../state'
+import { setItem, getItem, removeItem } from '../../storage'
 
 interface LoginAnswers {
   login: string,
@@ -6,15 +6,15 @@ interface LoginAnswers {
 }
 
 export function save(answers: LoginAnswers) {
-  State.save('repo.json', answers, 'config')
+  setItem('repo.json', answers, 'config')
 }
 
 export function get(): LoginAnswers {
-  return State.get<LoginAnswers>('repo.json', 'config')
+  return getItem<LoginAnswers>('repo.json', 'config')
 }
 
 export function remove() {
-  State.delete('repo.json', 'config')
+  removeItem('repo.json', 'config')
 }
 
 export function questions() {

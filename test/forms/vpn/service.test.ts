@@ -2,7 +2,7 @@ import { join } from 'path'
 import { readFileSync, existsSync } from 'fs'
 import { serviceForm } from '../../../src/forms/vpn'
 
-jest.mock('../../../src/state')
+jest.mock('../../../src/storage')
 
 describe('Vpn Service Form', () => {
   it('should save form', () => {

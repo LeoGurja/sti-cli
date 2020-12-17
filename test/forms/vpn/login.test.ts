@@ -2,7 +2,7 @@ import { join } from 'path'
 import { readFileSync, existsSync } from 'fs'
 import { loginForm } from '../../../src/forms/vpn'
 
-jest.mock('../../../src/state')
+jest.mock('../../../src/storage')
 
 const answers = {
   login: 'usuario_teste',
