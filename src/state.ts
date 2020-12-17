@@ -1,7 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import shell from './helpers/shell'
-import log from './helpers/log'
+import * as env from './environment'
 
 type StateType = 'config' | 'data' | 'cache'
 
@@ -38,28 +37,28 @@ export default class State {
 
   static sudoSave(path: string, data: any) {
     const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
-    shell.exec(`echo '${value}' | sudo tee ${path}`)
+    env.shell.exec(`echo '${value}' | sudo tee ${path}`)
   }
 
   static delete(name: string, type: StateType) {
-    shell.rm(State.getPath(name, type))
+    env.shell.rm(State.getPath(name, type))
   }
 
   static sudoDelete(path: string) {
-    shell.exec(`sudo rm ${path}`)
+    env.shell.exec(`sudo rm ${path}`)
   }
 
   static createDirs() {
     for (const type of Object.values(types)) {
-      if (shell.ls(type).code !== 0) {
-        log.debug(`Criando pasta ${type}`)
-        shell.mkdir(type)
+      if (env.shell.ls(type).code !== 0) {
+        env.log.debug(`Criando pasta ${type}`)
+        env.shell.mkdir(type)
       }
     }
   }
 }
 
 function printHomeNotFound(): never {
-  log.error('Não foi possível encontrar a HOME')
+  env.log.error('Não foi possível encontrar a HOME')
   process.exit(1)
 }
