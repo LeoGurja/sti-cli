@@ -28,7 +28,7 @@ function updateOrigin() {
   if (url.code !== 0) {
     env.log.error('Não foi possível ler a url do remoto')
   }
-  const novaUrl = url.stdout.replace(/:.+@/, `:${config.token}@`)
+  const novaUrl = url.stdout.replace(/:\/\/.+:.+@/, `://${config.login}:${config.token}@`)
   if (novaUrl === url.stdout) {
     env.log.error('Nova url é idêntica à antiga')
     return
