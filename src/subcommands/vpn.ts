@@ -3,6 +3,7 @@ import inquirer from 'inquirer'
 import { loginForm, serviceForm } from '../forms/vpn'
 import Cli from '../cli'
 import * as env from '../environment'
+import { delay } from '../helpers/delay'
 
 export default function vpn() {
   return new Cli('vpn')
@@ -16,6 +17,10 @@ export default function vpn() {
 }
 
 async function start() {
+  if (serviceIsRunning()) {
+    env.log.warning('a vpn já está ativada')
+    return
+  }
   const output = env.shell.exec('sudo systemctl start openfortivpn')
   if (output.code === 0) {
     return status()
@@ -38,23 +43,22 @@ function logout() {
 }
 
 async function status() {
-  try {
-    const response = await fetch('https://app.sti.uff.br/gitlab')
-    if (response.status === 200) {
-      env.log.sucess('Você está conectado à vpn!')
-    } else {
-      env.log.error('Houve um erro com a conexão, verifique a disponibilidade da vpn')
-    }
-  } catch {
-    if (!serviceIsRunning()) {
-      env.log.error("A vpn não está ligada, tente 'sti vpn start'")
-    } else {
-      env.log.error('Você não está conectado à vpn! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
-    }
+  if (!serviceIsRunning()) {
+    env.log.error("A vpn não está ligada, tente 'sti vpn start'")
+    return
   }
+  if (await hasConnection()) {
+    env.log.sucess('Você está conectado à vpn!')
+    return
+  }
+  env.log.error('A vpn está ativada, mas não há conexão! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
 }
 
 function stop() {
+  if (!serviceIsRunning()) {
+    env.log.warning('a vpn já está parada')
+    return
+  }
   const output = env.shell.exec('sudo systemctl stop openfortivpn')
   if (output.code === 0) {
     env.log.sucess('Vpn finalizada!')
@@ -85,7 +89,21 @@ function uninstall() {
   env.shell.exec('sudo systemctl daemon-reload')
 }
 
-function serviceIsRunning() {
+async function hasConnection(): Promise<boolean> {
+  for (let i = 1; i <= 3; i++) {
+    try {
+      const response = await fetch('https://app.sti.uff.br/gitlab')
+      return response.status === 200
+    } catch {
+      env.log.debug(`falhou a tentativa ${i} de acesso ao gitlab`)
+      await delay(200)
+    }
+  }
+  env.log.debug('desistindo da conexão')
+  return false
+}
+
+function serviceIsRunning(): boolean {
   const response = env.shell.exec('systemctl is-active openfortivpn')
   return response.code === 0
 }
