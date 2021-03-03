@@ -4,7 +4,7 @@ import * as env from '../environment'
 
 type StateType = 'config' | 'data' | 'cache'
 
-const types = {
+export const dirTypes = {
   config: './test/tmp/config',
   data: './test/tmp/data',
   cache: './test/tmp/cache'
@@ -45,11 +45,11 @@ export function sudoRemoveItem(path: string) {
 }
 
 export function getPath(name: string, type: StateType) {
-  return join(types[type], name)
+  return join(dirTypes[type], name)
 }
 
 export function createDirs() {
-  for (const type of Object.values(types)) {
+  for (const type of Object.values(dirTypes)) {
     if (env.shell.ls(type).code !== 0) {
       env.log.info(`Criando pasta ${type}`)
       env.shell.mkdir(type)
