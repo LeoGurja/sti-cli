@@ -2,6 +2,7 @@ import inquirer from 'inquirer'
 import Cli from '../cli'
 import * as env from '../environment'
 import { loginForm } from '../forms/repo'
+import ora from 'ora'
 
 export default function repo() {
   return new Cli('repo')
@@ -20,23 +21,24 @@ function clone(repo: string) {
 }
 
 function updateOrigin() {
+  const spinner = ora({ text: 'atualizando origem do remoto...' }).start()
+
   const config = loginForm.get()
   if (!config.token) {
-    env.log.error('É necessário fazer login antes de atualizar a url do remoto')
+    spinner.fail("É necessário fazer login com 'sti repo login' antes de atualizar a url do remoto")
   }
+
   const url = env.shell.exec('git remote get-url origin')
   if (url.code !== 0) {
-    env.log.error('Não foi possível ler a url do remoto')
-  }
-  const novaUrl = url.stdout.replace(/:\/\/.+:.+@/, `://${config.login}:${config.token}@`)
-  if (novaUrl === url.stdout) {
-    env.log.error('Nova url é idêntica à antiga')
+    spinner.fail('Não foi possível ler a url do remoto')
     return
   }
+
+  const novaUrl = url.stdout.replace(/:\/\/.+:.+@/, `://${config.login}:${config.token}@`)
   if (env.shell.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
-    env.log.error('Não foi possível atualizar a url do remoto')
+    spinner.fail('Não foi possível atualizar a url do remoto')
   } else {
-    env.log.sucess('Url atualizada!')
+    spinner.succeed('Url atualizada!')
   }
 }
 

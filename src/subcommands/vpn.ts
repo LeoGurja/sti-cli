@@ -4,6 +4,7 @@ import { loginForm, serviceForm } from '../forms/vpn'
 import Cli from '../cli'
 import * as env from '../environment'
 import { delay } from '../helpers/delay'
+import ora from 'ora'
 
 export default function vpn() {
   return new Cli('vpn')
@@ -43,15 +44,17 @@ function logout() {
 }
 
 async function status() {
+  const spinner = ora({ text: 'Checando status da conexão...' }).start()
   if (!serviceIsRunning()) {
-    env.log.error("A vpn não está ligada, tente 'sti vpn start'")
+    spinner.fail("A vpn não está ligada, tente 'sti vpn start'")
     return
   }
+
   if (await hasConnection()) {
-    env.log.sucess('Você está conectado à vpn!')
+    spinner.succeed('Você está conectado à vpn!')
     return
   }
-  env.log.error('A vpn está ativada, mas não há conexão! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
+  spinner.fail('A vpn está ativada, mas não há conexão! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
 }
 
 function stop() {
@@ -70,13 +73,13 @@ function stop() {
 
 function install() {
   if (!env.usesSystemd()) {
-    env.log.error('Não é possível utilizar a vpn em uma distribuição sem Systemd')
+    env.log.error('Não é possível utilizar a vpn pela cli em uma distribuição sem Systemd')
+    return
   }
-  if (!env.isInstalled('openfortivpn')) {
-    if (!env.install('openfortivpn')) {
-      env.log.error('Não foi possível instalar a vpn')
-      return
-    }
+
+  if (!env.install('openfortivpn')) {
+    env.log.error('Não foi possível instalar a vpn')
+    return
   }
 
   serviceForm.save()
@@ -90,13 +93,17 @@ function uninstall() {
 }
 
 async function hasConnection(): Promise<boolean> {
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 0; i <= 10; i++) {
     try {
       const response = await fetch('https://app.sti.uff.br/gitlab')
       return response.status === 200
-    } catch {
+    } catch (err) {
       env.log.debug(`falhou a tentativa ${i} de acesso ao gitlab`)
-      await delay(200)
+      if (err.code === 'ECONNRESET') {
+        await delay(1000)
+      } else {
+        break
+      }
     }
   }
   env.log.debug('desistindo da conexão')
