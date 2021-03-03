@@ -23,7 +23,6 @@ function installRvm() {
 }
 
 function installMysql() {
-  env.install('wget')
   mysqlForm.save()
   env.install(
     'mysql',
