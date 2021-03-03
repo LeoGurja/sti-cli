@@ -13,14 +13,10 @@ export function remove() {
 }
 
 function makeFile() {
-  return `
-### THIS FILE IS AUTOMATICALLY CONFIGURED ###
-# You may comment out entries below, but any other modifications may be lost.
-# Use command 'dpkg-reconfigure mysql-apt-config' as root for modifications.
+  return `### THIS FILE IS AUTOMATICALLY CONFIGURED ###
 deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-apt-config
 deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7
 deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-tools
 #deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-tools-preview
-deb-src http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7
-`
+deb-src http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7`
 }
