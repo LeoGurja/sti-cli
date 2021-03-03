@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "babel src --out-dir build --copy-files --extensions '.ts,.js'",
-    "dev": "DEBUG=true tsnd src/index.ts",
+    "debug": "DEBUG=true tsnd src/index.ts",
+    "dev": "tsnd src/index.ts",
     "test": "jest --coverage",
     "check": "tsc"
   },
