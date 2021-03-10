@@ -1,4 +1,5 @@
 import { setItem, getItem, removeItem } from '../../storage'
+import chalk from 'chalk'
 
 interface LoginAnswers {
   login: string,
@@ -22,12 +23,12 @@ export function questions() {
     {
       type: 'input',
       name: 'login',
-      message: 'usuário do gitlab'
+      message: 'usuário do gitlab: '
     },
     {
       type: 'input',
       name: 'token',
-      message: 'token de acesso'
+      message: chalk`token (crie um em {blue https://app.sti.uff.br/gitlab/profile/personal_access_tokens}): `
     }
   ]
 }
