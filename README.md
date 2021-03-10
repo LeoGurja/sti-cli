@@ -1,5 +1,5 @@
 # Sti Cli
-Interface de linha de comando para configuração de ambiente.
+Interface de linha de comando para configuração de ambiente.  
 Antes de tentar utilizar, olhe a [seção compatibilidade](#Compatibilidade)
 
 
