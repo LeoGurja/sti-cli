@@ -18,12 +18,12 @@ export function questions() {
     {
       type: 'input',
       name: 'login',
-      message: 'insira seu cpf'
+      message: 'seu cpf: '
     },
     {
       type: 'password',
       name: 'password',
-      message: 'senha do iduff'
+      message: 'senha do iduff: '
     }
   ]
 }
