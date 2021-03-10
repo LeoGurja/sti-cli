@@ -1,12 +1,13 @@
 # Sti Cli
-Interface de linha de comando para configuração de ambiente
+Interface de linha de comando para configuração de ambiente.
+Antes de tentar utilizar, olhe a [seção compatibilidade](#Compatibilidade)
+
 
 # Instalação
 simplesmente execute no seu terminal:
 ```bash
   sudo npm i -g @sti-uff/cli
 ```
-
 
 # Uso
 ## vpn
@@ -43,7 +44,7 @@ pronto! agora você pode clonar projetos à vontade
 ```
 
 # Compatibilidade
-A Cli deve funcionar com qualquer distribuição que utilize Systemd e apt-get
+Por enquanto, só há suporte para distribuições que utilizem Systemd e o apt.  
 Para saber se seu sistema utiliza o Sytemd execute:
 ```bash
   file /sbin/init
