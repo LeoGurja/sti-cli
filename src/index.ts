@@ -26,4 +26,4 @@ Caso enfrente algum problema, sinta-se livre para postar em {blue https://github
 cli.parse(process.argv)
 
 // check for new versions
-updateNotifier({ pkg }).notify()
+updateNotifier({ pkg }).notify({ isGlobal: true })
