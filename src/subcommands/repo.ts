@@ -12,12 +12,12 @@ export default function repo() {
     .add('update-origin', 'atualiza a url do projeto', updateOrigin)
 }
 
-function clone(repo: string) {
+function clone(repo: string, ...args: string[]) {
   const config = loginForm.get()
   if (!config.token) {
     env.log.error('É necessário fazer login antes de clonar um repositório')
   }
-  env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
+  env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo} ${args.join(' ')}`, { silent: false })
 }
 
 function updateOrigin() {
