@@ -11,7 +11,7 @@ export function remove() {
 }
 
 function makeFile() {
-  const user = process.env.USER || printUserNotFound()
+  const user = process.env.USER || env.log.error('Não foi possível encontrar a HOME')
   return `[Unit]
 Description=MySQL Server
 After=syslog.target
@@ -28,9 +28,4 @@ PrivateTmp=false
 [Install]
 WantedBy=multi-user.target
 `
-}
-
-function printUserNotFound(): never {
-  env.log.error('Não foi possível encontrar a HOME')
-  process.exit(1)
 }

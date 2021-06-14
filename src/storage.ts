@@ -4,7 +4,7 @@ import * as env from './environment'
 
 type StateType = 'config' | 'data' | 'cache'
 
-export const home: string = process.env.HOME || printHomeNotFound()
+export const home: string = process.env.HOME || env.log.error('Não foi possível encontrar a HOME')
 const configDir = process.env.XDG_CONFIG_HOME || join(home, '/.config')
 const dataDir = process.env.XDG_DATA_HOME || join(home, '/.local/share')
 const cacheDir = process.env.XDG_CACHE_HOME || join(home, '/.cache')
@@ -54,9 +54,4 @@ export function createDirs() {
       env.shell.mkdir(type)
     }
   }
-}
-
-function printHomeNotFound(): never {
-  env.log.error('Não foi possível encontrar a HOME')
-  process.exit(1)
 }
