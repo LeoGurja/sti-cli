@@ -3,6 +3,7 @@ import chalk from 'chalk'
 export default class Log {
   static error(message: string) {
     console.error(chalk.red(message))
+    process.exit(1)
   }
 
   static warning(message: string) {
