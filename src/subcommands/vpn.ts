@@ -5,6 +5,23 @@ import Cli from '../cli'
 import * as env from '../environment'
 import { delay } from '../helpers/delay'
 import ora from 'ora'
+import { dirTypes } from '../storage'
+
+const dependencies = [
+  { pkg: 'openfortivpn', message: 'Tente utilizar "sti vpn install"' }
+]
+
+const loginDependency = {
+  pkg: 'vpnLogin',
+  message: 'Tente utilizar "sti vpn login"',
+  custom: isLoggedIn
+}
+
+const serviceDependency = {
+  pkg: 'vpnSystemd',
+  message: 'Tente utilizar "sti vpn install"',
+  custom: serviceIsInstalled
+}
 
 export default function vpn() {
   return new Cli('vpn')
@@ -17,7 +34,9 @@ export default function vpn() {
     .add('uninstall', 'desinstala a vpn e remove o serviço', uninstall)
 }
 
-async function start() {
+export function start() {
+  env.dependency(...dependencies, serviceDependency, loginDependency)
+
   if (serviceIsRunning()) {
     env.log.warning('a vpn já está ativada')
     return
@@ -32,6 +51,8 @@ async function start() {
 }
 
 async function login() {
+  env.dependency(...dependencies)
+
   const answers = await inquirer.prompt(loginForm.questions())
   loginForm.save(answers)
 
@@ -39,11 +60,15 @@ async function login() {
 }
 
 function logout() {
+  env.dependency(...dependencies)
+
   loginForm.remove()
   env.log.sucess('Credenciais removidas!')
 }
 
 async function status() {
+  env.dependency(...dependencies, serviceDependency)
+
   const spinner = ora({ text: 'Checando status da conexão...' }).start()
   if (!serviceIsRunning()) {
     spinner.fail("A vpn não está ligada, tente 'sti vpn start'")
@@ -58,6 +83,8 @@ async function status() {
 }
 
 function stop() {
+  env.dependency(...dependencies, serviceDependency)
+
   if (!serviceIsRunning()) {
     env.log.warning('a vpn já está parada')
     return
@@ -72,6 +99,8 @@ function stop() {
 }
 
 function install() {
+  env.dependency(...dependencies)
+
   if (!env.usesSystemd()) {
     env.log.error('Não é possível utilizar a vpn pela cli em uma distribuição sem Systemd')
     return
@@ -88,11 +117,13 @@ function install() {
 }
 
 function uninstall() {
+  env.dependency(...dependencies)
+
   serviceForm.remove()
   env.shell.exec('sudo systemctl daemon-reload')
 }
 
-async function hasConnection(): Promise<boolean> {
+export async function hasConnection(): Promise<boolean> {
   for (let i = 0; i <= 10; i++) {
     try {
       const response = await fetch('https://app.sti.uff.br/gitlab')
@@ -110,7 +141,15 @@ async function hasConnection(): Promise<boolean> {
   return false
 }
 
-function serviceIsRunning(): boolean {
+function isLoggedIn(): boolean {
+  return env.shell.exec(`cat ${dirTypes.config}/vpnconfig`).code === 0
+}
+
+export function serviceIsRunning(): boolean {
   const response = env.shell.exec('systemctl is-active openfortivpn')
   return response.code === 0
+}
+
+function serviceIsInstalled(): boolean {
+  return env.shell.exec('systemctl list-units').stdout.includes('openfortivpn.service')
 }

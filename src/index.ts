@@ -3,7 +3,7 @@ import updateNotifier from 'update-notifier'
 import pkg from '../package.json'
 import Cli from './cli'
 import chalk from 'chalk'
-import { vpn, repo, setup } from './subcommands'
+import { vpn, repo, setup, db } from './subcommands'
 import { createDirs } from './storage'
 require('@babel/register')({ extensions: ['.js', '.ts'] })
 
@@ -14,6 +14,7 @@ createDirs()
 const cli = new Cli('sti')
   .addSubCommand(vpn())
   .addSubCommand(repo())
+  .addSubCommand(db())
   .add(...setup())
   .version(pkg.version)
 

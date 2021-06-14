@@ -16,9 +16,10 @@ Documentation=man:openfortivpn(1)
 [Service]
 User=root
 Type=idle
-ExecStart = /usr/bin/openfortivpn -c ${getPath('vpnconfig', 'config')} --persistent=5
+ExecStart = /home/linuxbrew/.linuxbrew/bin/openfortivpn -c ${getPath('vpnconfig', 'config')} --persistent=5
 KillSignal=SIGTERM
 
 [Install]
-WantedBy=multi-user.target`
+WantedBy=multi-user.target
+`
 }
