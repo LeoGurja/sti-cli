@@ -1,74 +1,50 @@
 import { dirTypes } from './../storage'
 import Cli from '../cli'
-import repo from './repo'
+import { clone } from './repo'
 import * as env from '../environment'
 import { mysqlForm } from '../forms/db'
+import ora from 'ora'
 
 export default function db() {
-  return new Cli('repo')
+  return new Cli('db')
     .add('install-mysql', 'instala o mysql 5.7', installMysql)
     .add('install-oracle', 'instala o oracle-client 12c', installOracle)
 }
 
 function installMysql() {
-  mysqlForm.save()
-  env.install(
-    'mysql',
-    'mysql-client=5.7.32-1ubuntu18.04 mysql-server=5.7.32-1ubuntu18.04 libmysqlclient-dev=5.7.32-1ubuntu18.04'
-  )
-  env.shell.exec('sudo apt-mark hold mysql-client libmysqlclient-dev mysql-server', { silent: false })
+  env.dependency({ pkg: 'brew', message: 'Tente utilizar "sti setup"' })
 
-  env.shell.exec('sudo mysql_secure_installation', { silent: false })
+  env.install('mysql', () => env.shell.exec('brew install mysql@5.7').code === 0)
+
+  let spinner = ora({ text: 'Preparando ambiente...' }).start()
+  env.addToProfile('export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/opt/mysql@5.7/include"')
+  env.shell.exec('sudo ln -s /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20')
+  spinner.succeed('Ambiente configurado!')
+
+  spinner = ora({ text: 'Adicionando Mysql ao Systemd...' })
+  mysqlForm.save()
+  env.shell.exec('sudo systemctl daemon-reload')
+  env.shell.exec('sudo systemctl enable mysqld.service')
+  env.shell.exec('sudo systemctl start mysqld.service')
+
+  spinner.succeed('Serviço Systemd criado!\n')
+  env.log.sucess('Utilize "mysql_secure_installation" para configurar a instalação!')
 }
 
 function installOracle() {
-  repo().parse(['clone', 'apps/ruby251-nginx-oracle', dirTypes.cache])
+  clone('apps/ruby261-nginx-oracle', dirTypes.cache)
 
-  env.shell.ls(`${dirTypes.cache}/ruby251-nginx-oracle/*.zip`).forEach(file => {
+  let spinner = ora({ text: 'Extraindo arquivos...' }).start()
+  env.shell.exec('sudo mkdir /opt/oracle')
+  env.shell.ls(`${dirTypes.cache}/oracle-instant-client/*.zip`).forEach(file => {
     env.shell.exec(`sudo unzip ${file} -d /opt/oracle`)
   })
+  spinner.succeed('Arquivos extraídos!')
 
+  spinner = ora({ text: 'Preparando ambiente...' }).start()
   env.shell.exec('sudo ln -s /opt/oracle/instantclient_12_2/libclntsh.so.12.1 /opt/oracle/instantclient_12_2/libclntsh.so')
+  env.addToProfile('export LD_LIBRARY=/opt/oracle/instant_client_12_2')
+  spinner.succeed('Ambiente configurado!')
 
-  env.shell.exec(`echo 'LD_LIBRARY=/opt/oracle/instant_client_12_2\n' >> ${process.env.HOME}/.profile`)
+  env.shell.exec(`rm -rf ${dirTypes.cache}`)
 }
-
-// /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-// PATH="/usr/local/opt/mysql@5.7/bin:$PATH"' >> ~/.profile
-// PATH="/usr/local/opt/mysql@5.7/bin:$PATH"' >> ~/.zprofile
-// mysql_secure_installation
-// sudo ln -s /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20
-
-/*
-#!/bin/bash
-# chkconfig: 2345 20 80
-# description: Mysql server
-
-start() {
-  mysql.server start
-}
-
-stop() {
-  mysql.server stop
-}
-
-case "$1" in
-  start)
-    start
-    ;;
-  stop)
-    stop
-    ;;
-  restart)
-    stop
-    start
-    ;;
-  status)
-    mysql.server status
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|status|restart}"
-esac
-
-exit 0
-*/

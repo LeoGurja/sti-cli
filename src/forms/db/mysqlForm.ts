@@ -3,20 +3,34 @@ import * as env from '../../environment'
 import { sudoSetItem, sudoRemoveItem } from '../../storage'
 
 export function save() {
-  sudoSetItem('/etc/apt/sources.list.d/mysql.list', makeFile())
-  env.shell.exec('sudo apt update')
+  sudoSetItem('/usr/lib/systemd/system/mysqld.service', makeFile())
 }
 
 export function remove() {
-  sudoRemoveItem('/etc/apt/sources.list.d/mysql.list')
-  env.shell.exec('sudo apt update')
+  sudoRemoveItem('/usr/lib/systemd/system/mysqld.service')
 }
 
 function makeFile() {
-  return `### THIS FILE IS AUTOMATICALLY CONFIGURED ###
-deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-apt-config
-deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7
-deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-tools
-#deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-tools-preview
-deb-src http://repo.mysql.com/apt/ubuntu/ bionic mysql-5.7`
+  const user = process.env.USER || printUserNotFound()
+  return `[Unit]
+Description=MySQL Server
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/linuxbrew/.linuxbrew/opt/mysql@5.7/bin/mysqld
+TimeoutSec=300
+User=${user.trim()}
+WorkingDirectory=/usr
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
+`
+}
+
+function printUserNotFound(): never {
+  env.log.error('Não foi possível encontrar a HOME')
+  process.exit(1)
 }
