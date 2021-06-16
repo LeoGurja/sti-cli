@@ -151,5 +151,5 @@ export function serviceIsRunning(): boolean {
 }
 
 function serviceIsInstalled(): boolean {
-  return env.shell.exec('systemctl list-units').stdout.includes('openfortivpn.service')
+  return env.shell.exec('systemctl list-unit-files').stdout.includes('openfortivpn.service')
 }
