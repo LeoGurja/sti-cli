@@ -32,12 +32,13 @@ function installMysql() {
 }
 
 function installOracle() {
-  clone('apps/ruby261-nginx-oracle', dirTypes.cache)
+  const folder = `${dirTypes.cache}/oracle-db`
+  clone(`apps/ruby261-nginx-oracle ${folder}`)
 
   let spinner = ora({ text: 'Extraindo arquivos...' }).start()
   env.shell.exec('sudo mkdir /opt/oracle')
-  env.shell.ls(`${dirTypes.cache}/oracle-instant-client/*.zip`).forEach(file => {
-    env.shell.exec(`sudo unzip ${file} -d /opt/oracle`)
+  env.shell.ls(`${folder}/oracle-instant-client/*.zip`).forEach(file => {
+    env.shell.exec(`sudo unzip -o ${file} -d /opt/oracle`)
   })
   spinner.succeed('Arquivos extraídos!')
 
@@ -46,5 +47,5 @@ function installOracle() {
   env.addToProfile('export LD_LIBRARY=/opt/oracle/instant_client_12_2')
   spinner.succeed('Ambiente configurado!')
 
-  env.shell.exec(`rm -rf ${dirTypes.cache}`)
+  env.shell.exec(`rm -rf ${folder}`)
 }
