@@ -32,15 +32,13 @@ export default function repo() {
     .add('update-origin', 'atualiza a url do projeto', updateOrigin)
 }
 
-export function clone(repo: string, ...args: string[]) {
+export function clone(repo: string) {
   env.dependency(...dependencies, ...vpnDependency, loginDependency)
   const config = loginForm.get()
   if (!config.token) {
     env.log.error('É necessário fazer login antes de clonar um repositório')
   }
-  const spinner = ora({ text: `Clonando ${repo}...` }).start()
-  env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo} ${args.join(' ')}`)
-  spinner.succeed(`${repo} clonado com sucesso!`)
+  env.shell.exec(`git clone https://${config.login}:${config.token}@app.sti.uff.br/gitlab/${repo}`, { silent: false })
 }
 
 function updateOrigin() {
