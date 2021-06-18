@@ -7,8 +7,8 @@ type PackageManagerName = 'apt' | 'pacman'
 const packageManagers: PackageManagerName[] = ['apt', 'pacman']
 
 const commands = {
-  apt: 'install',
-  pacman: '-S'
+  apt: 'install -y',
+  pacman: '-S --noconfirm'
 }
 
 export async function install(packageName: string, custom?: string[] | (() => boolean)) {

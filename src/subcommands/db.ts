@@ -10,21 +10,21 @@ export default function db() {
     .add('install-oracle', 'instala o oracle-client 12c', installOracle)
 }
 
-function installMysql() {
+async function installMysql() {
   env.dependency({ pkg: 'brew', message: 'Tente utilizar "sti setup"' })
 
-  env.install('mysql', () => env.exec('brew install mysql@5.7').code === 0)
+  await env.install('mysql', () => !!env.exec('brew install mysql@5.7'))
 
-  withSpinner(
+  await withSpinner(
     async() => {
       env.addToProfile('export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/opt/mysql@5.7/include"')
-      env.exec('sudo ln -s /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20')
+      env.exec('sudo ln -sf /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20')
     },
     'Preparando ambiente...',
     'Ambiente configurado!'
   )
 
-  withSpinner(
+  await withSpinner(
     async() => {
       mysqlForm.save()
       env.exec('sudo systemctl daemon-reload')
@@ -38,11 +38,11 @@ function installMysql() {
   env.log.sucess('Utilize "mysql_secure_installation" para configurar a instalação!')
 }
 
-function installOracle() {
+async function installOracle() {
   const folder = `${env.dirTypes.cache}/oracle-db`
   clone(`apps/ruby261-nginx-oracle ${folder}`)
 
-  withSpinner(
+  await withSpinner(
     async() => {
       env.exec('sudo mkdir /opt/oracle')
       env.ls(`${folder}/oracle-instant-client/*.zip`).forEach(file => {
@@ -53,9 +53,9 @@ function installOracle() {
     'Arquivos extraídos!'
   )
 
-  withSpinner(
+  await withSpinner(
     async() => {
-      env.exec('sudo ln -s /opt/oracle/instantclient_12_2/libclntsh.so.12.1 /opt/oracle/instantclient_12_2/libclntsh.so')
+      env.exec('sudo ln -sf /opt/oracle/instantclient_12_2/libclntsh.so.12.1 /opt/oracle/instantclient_12_2/libclntsh.so')
       env.addToProfile('export LD_LIBRARY=/opt/oracle/instant_client_12_2')
     },
     'Preparando ambiente...',
