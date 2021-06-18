@@ -1,6 +1,6 @@
 {
   "name": "@sti-uff/cli",
-  "version": "1.0.0-2",
+  "version": "1.0.0-3",
   "description": "cli para configuração de ambiente da Sti Uff.",
   "main": "build/index.js",
   "author": "Leonardo Gurgel",
