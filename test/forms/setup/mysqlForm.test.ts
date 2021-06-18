@@ -23,11 +23,11 @@ WantedBy=multi-user.target
 describe('Vpn Service Form', () => {
   it('should save form', () => {
     mysqlForm.save()
-    expect(env.shell.exec).toBeCalledWith(`echo '${content}' | sudo tee /usr/lib/systemd/system/mysqld.service`)
+    expect(env.exec).toBeCalledWith(`echo '${content}' | sudo tee /usr/lib/systemd/system/mysqld.service`)
   })
 
   it('should delete form', () => {
     mysqlForm.remove()
-    expect(env.shell.exec).toBeCalledWith('sudo rm /usr/lib/systemd/system/mysqld.service')
+    expect(env.exec).toBeCalledWith('sudo rm /usr/lib/systemd/system/mysqld.service')
   })
 })

@@ -1,17 +1,15 @@
 import * as env from '../../environment'
 
-import { sudoSetItem, sudoRemoveItem } from '../../storage'
-
 export function save() {
-  sudoSetItem('/usr/lib/systemd/system/mysqld.service', makeFile())
+  env.sudoSetItem('/usr/lib/systemd/system/mysqld.service', makeFile())
 }
 
 export function remove() {
-  sudoRemoveItem('/usr/lib/systemd/system/mysqld.service')
+  env.sudoRemoveItem('/usr/lib/systemd/system/mysqld.service')
 }
 
 function makeFile() {
-  const user = process.env.USER || env.log.error('Não foi possível encontrar a HOME')
+  const user = process.env.USER || env.log.fatal('Não foi possível encontrar a HOME')
   return `[Unit]
 Description=MySQL Server
 After=syslog.target

@@ -4,7 +4,7 @@ import pkg from '../package.json'
 import Cli from './cli'
 import chalk from 'chalk'
 import { vpn, repo, setup, db } from './subcommands'
-import { createDirs } from './storage'
+import { createDirs } from './environment'
 require('@babel/register')({ extensions: ['.js', '.ts'] })
 
 // create needed directories

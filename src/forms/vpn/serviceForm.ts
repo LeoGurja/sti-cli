@@ -1,11 +1,11 @@
-import { sudoSetItem, sudoRemoveItem, getPath } from '../../storage'
+import * as env from '../../environment'
 
 export function save() {
-  sudoSetItem('/usr/lib/systemd/system/openfortivpn.service', makeFile())
+  env.sudoSetItem('/usr/lib/systemd/system/openfortivpn.service', makeFile())
 }
 
 export function remove() {
-  sudoRemoveItem('/usr/lib/systemd/system/openfortivpn.service')
+  env.sudoRemoveItem('/usr/lib/systemd/system/openfortivpn.service')
 }
 
 function makeFile() {
@@ -16,7 +16,7 @@ Documentation=man:openfortivpn(1)
 [Service]
 User=root
 Type=idle
-ExecStart = /home/linuxbrew/.linuxbrew/bin/openfortivpn -c ${getPath('vpnconfig', 'config')} --persistent=5
+ExecStart = /home/linuxbrew/.linuxbrew/bin/openfortivpn -c ${env.getPath('vpnconfig', 'config')} --persistent=5
 KillSignal=SIGTERM
 
 [Install]

@@ -1,18 +1,15 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import * as env from './environment'
+import log from './log'
+import { exec, rm, ls, mkdir } from './shell'
 
 type StateType = 'config' | 'data' | 'cache'
 
-export const home: string = process.env.HOME || env.log.error('Não foi possível encontrar a HOME')
-const configDir = process.env.XDG_CONFIG_HOME || join(home, '/.config')
-const dataDir = process.env.XDG_DATA_HOME || join(home, '/.local/share')
-const cacheDir = process.env.XDG_CACHE_HOME || join(home, '/.cache')
-
+export const home = process.env.HOME || log.fatal('Não foi possível encontrar a HOME')
 export const dirTypes = {
-  config: join(configDir, '/sti'),
-  data: join(dataDir, '/sti'),
-  cache: join(cacheDir, '/sti')
+  config: join(process.env.XDG_CONFIG_HOME || join(home, '/.config'), '/sti'),
+  data: join(process.env.XDG_DATA_HOME || join(home, '/.local/share'), '/sti'),
+  cache: join(process.env.XDG_CACHE_HOME || join(home, '/.cache'), '/sti')
 }
 
 export function getItem<T>(name: string, type: StateType): T {
@@ -31,16 +28,16 @@ export function setItem(name: string, data: any, type: StateType) {
 }
 
 export function removeItem(name: string, type: StateType) {
-  env.shell.rm(getPath(name, type))
+  rm(getPath(name, type))
 }
 
 export function sudoSetItem(path: string, data: any) {
   const value = typeof data === 'string' ? data : JSON.stringify(data, null, '\t')
-  env.shell.exec(`echo '${value}' | sudo tee ${path}`)
+  exec(`echo '${value}' | sudo tee ${path}`)
 }
 
 export function sudoRemoveItem(path: string) {
-  env.shell.exec(`sudo rm ${path}`)
+  exec(`sudo rm ${path}`)
 }
 
 export function getPath(name: string, type: StateType) {
@@ -49,9 +46,9 @@ export function getPath(name: string, type: StateType) {
 
 export function createDirs() {
   for (const type of Object.values(dirTypes)) {
-    if (env.shell.ls(type).code !== 0) {
-      env.log.debug(`Criando pasta ${type}`)
-      env.shell.mkdir(type)
+    if (ls(type).code !== 0) {
+      log.debug(`Criando pasta ${type}`)
+      mkdir(type)
     }
   }
 }

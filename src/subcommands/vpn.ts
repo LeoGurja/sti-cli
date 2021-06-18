@@ -4,8 +4,7 @@ import { loginForm, serviceForm } from '../forms/vpn'
 import Cli from '../cli'
 import * as env from '../environment'
 import { delay } from '../helpers/delay'
-import ora from 'ora'
-import { dirTypes } from '../storage'
+import withSpinner from '../helpers/withSpinner'
 
 const dependencies = [
   { pkg: 'openfortivpn', message: 'Tente utilizar "sti vpn install"' }
@@ -41,12 +40,11 @@ export function start() {
     env.log.warning('a vpn já está ativada')
     return
   }
-  const output = env.shell.exec('sudo systemctl start openfortivpn')
+  const output = env.exec('sudo systemctl start openfortivpn')
   if (output.code === 0) {
     return status()
   } else {
-    env.log.error('Erro ao iniciar vpn:')
-    env.log.error(output.stderr)
+    env.log.fatal(output.stderr)
   }
 }
 
@@ -66,20 +64,20 @@ function logout() {
   env.log.sucess('Credenciais removidas!')
 }
 
-async function status() {
+function status() {
   env.dependency(...dependencies, serviceDependency)
 
-  const spinner = ora({ text: 'Checando status da conexão...' }).start()
-  if (!serviceIsRunning()) {
-    spinner.fail("A vpn não está ligada, tente 'sti vpn start'")
-    return
-  }
-
-  if (await hasConnection()) {
-    spinner.succeed('Você está conectado à vpn!')
-    return
-  }
-  spinner.fail('A vpn está ativada, mas não há conexão! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
+  withSpinner(
+    async spinner => {
+      if (!serviceIsRunning()) {
+        spinner.fail("A vpn não está ligada, tente 'sti vpn start'")
+      } else if (!await hasConnection()) {
+        spinner.fail('A vpn está ativada, mas não há conexão! Verifique sua conexão, suas credenciais e a disponibilidade da vpn')
+      }
+    },
+    'Checando status da conexão...',
+    'Você está conectado à vpn!'
+  )
 }
 
 function stop() {
@@ -89,12 +87,11 @@ function stop() {
     env.log.warning('a vpn já está parada')
     return
   }
-  const output = env.shell.exec('sudo systemctl stop openfortivpn')
+  const output = env.exec('sudo systemctl stop openfortivpn')
   if (output.code === 0) {
     env.log.sucess('Vpn finalizada!')
   } else {
-    env.log.error('Erro ao fechar vpn:')
-    env.log.error(output.stderr)
+    env.log.fatal(output.stderr)
   }
 }
 
@@ -102,25 +99,31 @@ function install() {
   env.dependency(...dependencies)
 
   if (!env.usesSystemd()) {
-    env.log.error('Não é possível utilizar a vpn pela cli em uma distribuição sem Systemd')
-    return
+    env.log.fatal('Não é possível utilizar a vpn pela cli em uma distribuição sem Systemd')
   }
 
   if (!env.install('openfortivpn')) {
-    env.log.error('Não foi possível instalar a vpn')
-    return
+    env.log.fatal('Não foi possível instalar a vpn')
   }
 
   serviceForm.save()
 
-  env.shell.exec('sudo systemctl daemon-reload')
+  withSpinner(
+    async() => env.exec('sudo systemctl daemon-reload'),
+    'Recarregando daemon...',
+    'Daemon recarregado!'
+  )
 }
 
 function uninstall() {
   env.dependency(...dependencies)
 
   serviceForm.remove()
-  env.shell.exec('sudo systemctl daemon-reload')
+  withSpinner(
+    async() => env.exec('sudo systemctl daemon-reload'),
+    'Recarregando daemon...',
+    'Daemon recarregado!'
+  )
 }
 
 export async function hasConnection(): Promise<boolean> {
@@ -142,14 +145,14 @@ export async function hasConnection(): Promise<boolean> {
 }
 
 function isLoggedIn(): boolean {
-  return env.shell.exec(`cat ${dirTypes.config}/vpnconfig`).code === 0
+  return env.exec(`cat ${env.dirTypes.config}/vpnconfig`).code === 0
 }
 
 export function serviceIsRunning(): boolean {
-  const response = env.shell.exec('systemctl is-active openfortivpn')
+  const response = env.exec('systemctl is-active openfortivpn')
   return response.code === 0
 }
 
 function serviceIsInstalled(): boolean {
-  return env.shell.exec('systemctl list-unit-files').stdout.includes('openfortivpn.service')
+  return env.exec('systemctl list-unit-files').stdout.includes('openfortivpn.service')
 }

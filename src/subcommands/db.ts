@@ -1,9 +1,8 @@
-import { dirTypes } from './../storage'
 import Cli from '../cli'
 import { clone } from './repo'
 import * as env from '../environment'
 import { mysqlForm } from '../forms/db'
-import ora from 'ora'
+import withSpinner from '../helpers/withSpinner'
 
 export default function db() {
   return new Cli('db')
@@ -14,38 +13,54 @@ export default function db() {
 function installMysql() {
   env.dependency({ pkg: 'brew', message: 'Tente utilizar "sti setup"' })
 
-  env.install('mysql', () => env.shell.exec('brew install mysql@5.7').code === 0)
+  env.install('mysql', () => env.exec('brew install mysql@5.7').code === 0)
 
-  let spinner = ora({ text: 'Preparando ambiente...' }).start()
-  env.addToProfile('export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/opt/mysql@5.7/include"')
-  env.shell.exec('sudo ln -s /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20')
-  spinner.succeed('Ambiente configurado!')
+  withSpinner(
+    async() => {
+      env.addToProfile('export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/opt/mysql@5.7/include"')
+      env.exec('sudo ln -s /home/linuxbrew/.linuxbrew/opt/mysql@5.7/lib/libmysqlclient.so.20 /usr/lib/libmysqlclient.so.20')
+    },
+    'Preparando ambiente...',
+    'Ambiente configurado!'
+  )
 
-  spinner = ora({ text: 'Adicionando Mysql ao Systemd...' })
-  mysqlForm.save()
-  env.shell.exec('sudo systemctl daemon-reload')
-  env.shell.exec('sudo systemctl enable mysqld.service')
-  env.shell.exec('sudo systemctl start mysqld.service')
+  withSpinner(
+    async() => {
+      mysqlForm.save()
+      env.exec('sudo systemctl daemon-reload')
+      env.exec('sudo systemctl enable mysqld.service')
+      env.exec('sudo systemctl start mysqld.service')
+    },
+    'Adicionando Mysql ao Systemd...',
+    'Serviço criado!\n'
+  )
 
-  spinner.succeed('Serviço Systemd criado!\n')
   env.log.sucess('Utilize "mysql_secure_installation" para configurar a instalação!')
 }
 
 function installOracle() {
-  const folder = `${dirTypes.cache}/oracle-db`
+  const folder = `${env.dirTypes.cache}/oracle-db`
   clone(`apps/ruby261-nginx-oracle ${folder}`)
 
-  let spinner = ora({ text: 'Extraindo arquivos...' }).start()
-  env.shell.exec('sudo mkdir /opt/oracle')
-  env.shell.ls(`${folder}/oracle-instant-client/*.zip`).forEach(file => {
-    env.shell.exec(`sudo unzip -o ${file} -d /opt/oracle`)
-  })
-  spinner.succeed('Arquivos extraídos!')
+  withSpinner(
+    async() => {
+      env.exec('sudo mkdir /opt/oracle')
+      env.ls(`${folder}/oracle-instant-client/*.zip`).forEach(file => {
+        env.exec(`sudo unzip -o ${file} -d /opt/oracle`)
+      })
+    },
+    'Extraindo arquivos...',
+    'Arquivos extraídos!'
+  )
 
-  spinner = ora({ text: 'Preparando ambiente...' }).start()
-  env.shell.exec('sudo ln -s /opt/oracle/instantclient_12_2/libclntsh.so.12.1 /opt/oracle/instantclient_12_2/libclntsh.so')
-  env.addToProfile('export LD_LIBRARY=/opt/oracle/instant_client_12_2')
-  spinner.succeed('Ambiente configurado!')
+  withSpinner(
+    async() => {
+      env.exec('sudo ln -s /opt/oracle/instantclient_12_2/libclntsh.so.12.1 /opt/oracle/instantclient_12_2/libclntsh.so')
+      env.addToProfile('export LD_LIBRARY=/opt/oracle/instant_client_12_2')
+    },
+    'Preparando ambiente...',
+    'Ambiente configurado!'
+  )
 
-  env.shell.exec(`rm -rf ${folder}`)
+  env.exec(`rm -rf ${folder}`)
 }

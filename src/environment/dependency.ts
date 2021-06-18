@@ -1,4 +1,4 @@
-import shell from './shell'
+import { exec } from './shell'
 import log from './log'
 
 interface Dependency {
@@ -14,11 +14,11 @@ export function dependency(...packages: Dependency[]) {
     } else {
       if (isInstalled(pkg.pkg)) continue
     }
-    log.error(`Este comando depende de ${pkg.pkg}.\n${pkg.message}`)
+    log.fatal(`Este comando depende de ${pkg.pkg}.\n${pkg.message}`)
   }
 }
 
 export function isInstalled(packageName: string): boolean {
-  const output = shell.exec(`${packageName} --version`)
+  const output = exec(`${packageName} --version`)
   return output.code === 0
 }

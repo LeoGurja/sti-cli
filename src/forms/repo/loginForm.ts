@@ -1,4 +1,4 @@
-import { setItem, getItem, removeItem } from '../../storage'
+import * as env from '../../environment'
 import chalk from 'chalk'
 
 interface LoginAnswers {
@@ -7,15 +7,15 @@ interface LoginAnswers {
 }
 
 export function save(answers: LoginAnswers) {
-  setItem('repo.json', answers, 'config')
+  env.setItem('repo.json', answers, 'config')
 }
 
 export function get(): LoginAnswers {
-  return getItem<LoginAnswers>('repo.json', 'config')
+  return env.getItem<LoginAnswers>('repo.json', 'config')
 }
 
 export function remove() {
-  removeItem('repo.json', 'config')
+  env.removeItem('repo.json', 'config')
 }
 
 export function questions() {

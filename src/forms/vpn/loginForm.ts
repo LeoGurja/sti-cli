@@ -1,4 +1,4 @@
-import { setItem, removeItem } from '../../storage'
+import * as env from '../../environment'
 
 interface LoginAnswers {
   login: string,
@@ -6,11 +6,11 @@ interface LoginAnswers {
 }
 
 export function save(answers: LoginAnswers) {
-  setItem('vpnconfig', makeFile(answers), 'config')
+  env.setItem('vpnconfig', makeFile(answers), 'config')
 }
 
 export function remove() {
-  removeItem('vpnconfig', 'config')
+  env.removeItem('vpnconfig', 'config')
 }
 
 export function questions() {

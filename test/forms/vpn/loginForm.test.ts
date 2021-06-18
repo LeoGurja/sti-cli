@@ -1,7 +1,6 @@
 import { join } from 'path'
 import fs from 'fs'
 import { loginForm } from '../../../src/forms/vpn'
-import { dirTypes } from '../../../src/storage'
 import * as env from '../../../src/environment'
 
 jest.mock('fs')
@@ -23,12 +22,12 @@ describe('Vpn Login Form', () => {
   it('should save form', () => {
     loginForm.save(answers)
 
-    expect(fs.writeFileSync).toBeCalledWith(join(dirTypes.config, 'vpnconfig'), content)
+    expect(fs.writeFileSync).toBeCalledWith(join(env.dirTypes.config, 'vpnconfig'), content)
   })
 
   it('should delete form', () => {
     loginForm.remove()
 
-    expect(env.shell.rm).toBeCalledWith(join(dirTypes.config, 'vpnconfig'))
+    expect(env.rm).toBeCalledWith(join(env.dirTypes.config, 'vpnconfig'))
   })
 })

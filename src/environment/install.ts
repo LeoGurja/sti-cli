@@ -1,6 +1,6 @@
-import shell from './shell'
-import ora from 'ora'
+import { exec } from './shell'
 import { isInstalled } from './dependency'
+import withSpinner from '../helpers/withSpinner'
 
 type PackageManagerName = 'apt' | 'pacman'
 
@@ -11,23 +11,23 @@ const commands = {
   pacman: '-S'
 }
 
-export function install(packageName: string, custom?: string[] | (() => boolean)): boolean {
-  const spinner = ora({ text: `Instalando ${packageName}...` }).start()
-  if (isInstalled(packageName)) {
-    spinner.succeed(`${packageName} já está instalado!`)
-    return true
-  }
-  const success = custom
-    ? customInstall(custom)
-    : packageManagerInstall(packageName)
+export async function install(packageName: string, custom?: string[] | (() => boolean)) {
+  return !!await withSpinner(
+    async spinner => {
+      if (isInstalled(packageName)) {
+        spinner.succeed(`${packageName} já está instalado!`)
+        return true
+      }
+      const success = custom
+        ? customInstall(custom)
+        : packageManagerInstall(packageName)
 
-  if (success) {
-    spinner.succeed(`${packageName} instalado!`)
-    return true
-  } else {
-    spinner.fail(`Não foi possível instalar ${packageName}`)
-    return false
-  }
+      if (!success) spinner.fail(`Não foi possível instalar ${packageName}!`)
+      return success
+    },
+    `Instalando ${packageName}...`,
+    `${packageName} instalado!`
+  )
 }
 
 function customInstall(custom: string[] | (() => boolean)): boolean {
@@ -39,16 +39,16 @@ function customInstall(custom: string[] | (() => boolean)): boolean {
 function packageManagerInstall(packageName: string, fallbacks?: string[]): boolean {
   const packageManager = getPackageManager()
 
-  const output = shell.exec(`sudo ${packageManager} ${commands[packageManager]} ${packageName}`, { silent: false })
+  const output = exec(`sudo ${packageManager} ${commands[packageManager]} ${packageName}`, { silent: false })
   if (output.code === 0) return true
 
   if (!fallbacks) return false
-  return fallbacks.some(pkg => shell.exec(`sudo ${packageManager} ${commands[packageManager]} ${pkg}`, { silent: false }))
+  return fallbacks.some(pkg => exec(`sudo ${packageManager} ${commands[packageManager]} ${pkg}`, { silent: false }))
 }
 
 function getPackageManager(): PackageManagerName {
   for (const packageManager of packageManagers) {
-    const output = shell.exec(`${packageManager} --version`)
+    const output = exec(`${packageManager} --version`)
     if (output.code === 0) return packageManager
   }
 
