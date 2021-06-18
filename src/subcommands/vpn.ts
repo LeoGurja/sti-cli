@@ -40,11 +40,12 @@ export function start() {
     env.log.warning('a vpn já está ativada')
     return
   }
-  const output = env.exec('sudo systemctl start openfortivpn')
-  if (output.code === 0) {
+
+  try {
+    env.exec('sudo systemctl start openfortivpn')
     return status()
-  } else {
-    env.log.fatal(output.stderr)
+  } catch (err) {
+    env.log.fatal(err)
   }
 }
 
@@ -87,11 +88,12 @@ function stop() {
     env.log.warning('a vpn já está parada')
     return
   }
-  const output = env.exec('sudo systemctl stop openfortivpn')
-  if (output.code === 0) {
+
+  try {
+    env.exec('sudo systemctl stop openfortivpn')
     env.log.sucess('Vpn finalizada!')
-  } else {
-    env.log.fatal(output.stderr)
+  } catch (err) {
+    env.log.fatal(err)
   }
 }
 
@@ -145,12 +147,21 @@ export async function hasConnection(): Promise<boolean> {
 }
 
 function isLoggedIn(): boolean {
-  return env.exec(`cat ${env.dirTypes.config}/vpnconfig`).code === 0
+  try {
+    env.exec(`cat ${env.dirTypes.config}/vpnconfig`)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function serviceIsRunning(): boolean {
-  const response = env.exec('systemctl is-active openfortivpn')
-  return response.code === 0
+  try {
+    env.exec('systemctl is-active openfortivpn')
+    return true
+  } catch {
+    return false
+  }
 }
 
 function serviceIsInstalled(): boolean {

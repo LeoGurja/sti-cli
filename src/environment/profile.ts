@@ -14,7 +14,13 @@ export function addToProfile(line: string): boolean {
     const filePath: string = shellFiles[process.env.SHELL]
 
     if (!isInProfile(line, filePath)) {
-      return exec(`echo '${line}' >> ${filePath}`).code === 0
+      try {
+        exec(`echo '${line}' >> ${filePath}`)
+        return true
+      } catch {
+        log.warning(`Por favor, adicione a seguinte linha à configuração de inicialização da sua shell:\n${line}`)
+        return false
+      }
     }
     return true
   } else {

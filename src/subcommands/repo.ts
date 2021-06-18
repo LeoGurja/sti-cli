@@ -51,14 +51,11 @@ function updateOrigin() {
         spinner.fail("É necessário fazer login com 'sti repo login' antes de atualizar a url do remoto")
       }
 
-      const url = env.exec('git remote get-url origin')
-      if (url.code !== 0) {
-        spinner.fail('Não foi possível ler a url do remoto')
-        return
-      }
-
-      const novaUrl = url.stdout.replace(/:\/\/.+:.+@/, `://${config.login}:${config.token}@`)
-      if (env.exec(`git remote set-url origin ${novaUrl}`).code !== 0) {
+      try {
+        const url = env.exec('git remote get-url origin')
+        const novaUrl = url.stdout.replace(/:\/\/.+:.+@/, `://${config.login}:${config.token}@`)
+        env.exec(`git remote set-url origin ${novaUrl}`)
+      } catch {
         spinner.fail('Não foi possível atualizar a url do remoto')
       }
     },

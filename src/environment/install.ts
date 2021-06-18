@@ -1,6 +1,7 @@
 import { exec } from './shell'
 import { isInstalled } from './dependency'
 import withSpinner from '../helpers/withSpinner'
+import { ShellString } from 'shelljs'
 
 type PackageManagerName = 'apt' | 'pacman'
 
@@ -11,7 +12,7 @@ const commands = {
   pacman: '-S --noconfirm'
 }
 
-export async function install(packageName: string, custom?: string[] | (() => boolean)) {
+export async function install(packageName: string, custom?: string[] | (() => boolean | ShellString)) {
   return !!await withSpinner(
     async spinner => {
       if (isInstalled(packageName)) {
@@ -30,28 +31,39 @@ export async function install(packageName: string, custom?: string[] | (() => bo
   )
 }
 
-function customInstall(custom: string[] | (() => boolean)): boolean {
-  return isArray<string>(custom)
-    ? custom.some(pkg => packageManagerInstall(pkg))
-    : custom()
+function customInstall(custom: string[] | (() => boolean | ShellString)): boolean {
+  if (isArray<string>(custom)) {
+    return custom.some(pkg => packageManagerInstall(pkg))
+  }
+  try {
+    custom()
+    return true
+  } catch {
+    return false
+  }
 }
 
 function packageManagerInstall(packageName: string, fallbacks?: string[]): boolean {
   const packageManager = getPackageManager()
 
-  const output = exec(`sudo ${packageManager} ${commands[packageManager]} ${packageName}`, { silent: false })
-  if (output.code === 0) return true
-
-  if (!fallbacks) return false
-  return fallbacks.some(pkg => exec(`sudo ${packageManager} ${commands[packageManager]} ${pkg}`, { silent: false }))
+  try {
+    exec(`sudo ${packageManager} ${commands[packageManager]} ${packageName}`, { silent: false })
+    return true
+  } catch {
+    if (!fallbacks) return false
+    return fallbacks.some(pkg => exec(`sudo ${packageManager} ${commands[packageManager]} ${pkg}`, { silent: false }))
+  }
 }
 
 function getPackageManager(): PackageManagerName {
   for (const packageManager of packageManagers) {
-    const output = exec(`${packageManager} --version`)
-    if (output.code === 0) return packageManager
+    try {
+      exec(`${packageManager} --version`)
+      return packageManager
+    } catch {
+      continue
+    }
   }
-
   throw new Error('Gerenciador de pacote não encontrado!')
 }
 

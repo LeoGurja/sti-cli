@@ -19,6 +19,10 @@ export function dependency(...packages: Dependency[]) {
 }
 
 export function isInstalled(packageName: string): boolean {
-  const output = exec(`${packageName} --version`)
-  return output.code === 0
+  try {
+    exec(`${packageName} --version`)
+    return true
+  } catch {
+    return false
+  }
 }
