@@ -1,1 +1,8 @@
-rodar vpn install no setup
+- rodar vpn install no setup
+- criar /usr/lib/systemd/system caso não exista
+- aceitar qualquer instalação da vpn
+- carregar brew logo apos instalar
+- instalar nvm no setup (?)
+- mover comandos do shell para shell script
+- também encontrar shells que estejam em /usr/bin
+- usar config.fatal = true no shelljs
